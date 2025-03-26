@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skaffold Demo - Translate</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Skaffold Demo - Translate</h1>
+        <div class="translation-container">
+            <div class="language-controls">
+                <div class="language-selector">
+                    <select id="source-language">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                    </select>
+                </div>
+                <button id="swap-languages">
+                    <span>⇄</span>
+                </button>
+                <div class="language-selector">
+                    <select id="target-language">
+                        <option value="es">Spanish</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="text-areas">
+                <div class="text-area-container">
+                    <textarea id="source-text" placeholder="Enter text to translate"></textarea>
+                </div>
+                <div class="text-area-container">
+                    <textarea id="target-text" placeholder="Translation will appear here" readonly></textarea>
+                </div>
+            </div>
+            
+            <div class="button-container">
+                <button id="translate-btn">Translate</button>
+            </div>
+            
+            <div id="error-message" class="error-message"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sourceText = document.getElementById('source-text');
+            const targetText = document.getElementById('target-text');
+            const sourceLanguage = document.getElementById('source-language');
+            const targetLanguage = document.getElementById('target-language');
+            const translateBtn = document.getElementById('translate-btn');
+            const swapBtn = document.getElementById('swap-languages');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Translate text
+            translateBtn.addEventListener('click', function() {
+                if (!sourceText.value.trim()) {
+                    errorMessage.textContent = 'Please enter text to translate';
+                    return;
+                }
+                
+                errorMessage.textContent = '';
+                translateText();
+            });
+            
+            // Swap languages
+            swapBtn.addEventListener('click', function() {
+                const tempLang = sourceLanguage.value;
+                sourceLanguage.value = targetLanguage.value;
+                targetLanguage.value = tempLang;
+                
+                const tempText = sourceText.value;
+                sourceText.value = targetText.value;
+                targetText.value = tempText;
+            });
+            
+            function translateText() {
+                const formData = new FormData();
+                formData.append('text', sourceText.value);
+                formData.append('source_lang', sourceLanguage.value);
+                formData.append('target_lang', targetLanguage.value);
+                
+                fetch('/translate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        errorMessage.textContent = data.error;
+                    } else {
+                        targetText.value = data.translated_text;
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'An error occurred while translating';
+                    console.error('Translation error:', error);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

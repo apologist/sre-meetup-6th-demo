@@ -1,0 +1,48 @@
+replicaCount: 1
+
+image:
+  repository: "<set-from-skaffold>"
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: translation-app.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    memory: 1024Mi
+  requests:
+    cpu: 250m
+    memory: 1024Mi
+
+nodeSelector: {}
+
+tolerations: {}
+
+affinity: {}
+
+env:
+  LOG_LEVEL: "info"

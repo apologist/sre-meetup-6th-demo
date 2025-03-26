@@ -1,0 +1,34 @@
+apiVersion: skaffold/v4beta12
+kind: Config
+metadata:
+  name: preply-sre-meetup-demo-skaffold
+profiles:
+- name: demo
+  build:
+    artifacts:
+    - image: <ECR_REPO>
+      context: .
+      # sync:
+      #   infer:
+      #     - '**/*.py'
+    tagPolicy:
+      envTemplate:
+        template: '{{.RELEASE}}'
+    local:
+      push: true
+      useDockerCLI: true
+      useBuildkit: true
+  deploy:
+    helm:
+      releases:
+      - name: demo-sre-meetup
+        chartPath: helm/demo-sre-meetup
+        wait: false
+        valuesFiles:
+        - helm/demo-sre-meetup/values.yaml
+        setValueTemplates:
+          image.tag: '{{.RELEASE}}'
+          image.repository: '{{.ECR_REPO}}'
+          ingress.class: '{{.EKS_INGRESS_CLASS}}'
+        packaged:
+          appVersion: '{{.RELEASE}}'

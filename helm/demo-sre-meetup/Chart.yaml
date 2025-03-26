@@ -1,0 +1,13 @@
+apiVersion: v2
+name: preply-sre-meetup-demo-skaffold
+description: Preply SRE meetup demo for skaffold
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - translation
+  - argos-translate
+  - fastapi
+  - demo
+  - skaffold
+  - preply
